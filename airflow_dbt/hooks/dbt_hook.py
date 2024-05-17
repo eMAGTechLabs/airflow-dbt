@@ -41,23 +41,25 @@ class DbtCliHook(BaseHook):
     :type verbose: bool
     """
 
-    def __init__(self,
-                 env=None,
-                 profiles_dir=None,
-                 target=None,
-                 dir='.',
-                 vars=None,
-                 full_refresh=False,
-                 data=False,
-                 schema=False,
-                 models=None,
-                 exclude=None,
-                 select=None,
-                 selector=None,
-                 dbt_bin='dbt',
-                 output_encoding='utf-8',
-                 verbose=True,
-                 warn_error=False):
+    def __init__(
+        self,
+        env=None,
+        profiles_dir=None,
+        target=None,
+        dir=".",
+        vars=None,
+        full_refresh=False,
+        data=False,
+        schema=False,
+        models=None,
+        exclude=None,
+        select=None,
+        selector=None,
+        dbt_bin="dbt",
+        output_encoding="utf-8",
+        verbose=True,
+        warn_error=False,
+    ):
         self.env = env or {}
         self.profiles_dir = profiles_dir
         self.dir = dir
@@ -92,37 +94,37 @@ class DbtCliHook(BaseHook):
         dbt_cmd = [self.dbt_bin, *command]
 
         if self.profiles_dir is not None:
-            dbt_cmd.extend(['--profiles-dir', self.profiles_dir])
+            dbt_cmd.extend(["--profiles-dir", self.profiles_dir])
 
         if self.target is not None:
-            dbt_cmd.extend(['--target', self.target])
+            dbt_cmd.extend(["--target", self.target])
 
         if self.vars is not None:
-            dbt_cmd.extend(['--vars', self._dump_vars()])
+            dbt_cmd.extend(["--vars", self._dump_vars()])
 
         if self.data:
-            dbt_cmd.extend(['--data'])
+            dbt_cmd.extend(["--data"])
 
         if self.schema:
-            dbt_cmd.extend(['--schema'])
+            dbt_cmd.extend(["--schema"])
 
         if self.models is not None:
-            dbt_cmd.extend(['--models', self.models])
+            dbt_cmd.extend(["--models", self.models])
 
         if self.exclude is not None:
-            dbt_cmd.extend(['--exclude', self.exclude])
+            dbt_cmd.extend(["--exclude", self.exclude])
 
         if self.select is not None:
-            dbt_cmd.extend(['--select', self.select])
+            dbt_cmd.extend(["--select", self.select])
 
         if self.selector is not None:
-            dbt_cmd.extend(['--selector', self.selector])
+            dbt_cmd.extend(["--selector", self.selector])
 
         if self.full_refresh:
-            dbt_cmd.extend(['--full-refresh'])
+            dbt_cmd.extend(["--full-refresh"])
 
         if self.warn_error:
-            dbt_cmd.insert(1, '--warn-error')
+            dbt_cmd.insert(1, "--warn-error")
 
         if self.verbose:
             self.log.info(" ".join(dbt_cmd))
@@ -133,22 +135,20 @@ class DbtCliHook(BaseHook):
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             cwd=self.dir,
-            close_fds=True)
+            close_fds=True,
+        )
         self.sp = sp
         self.log.info("Output:")
-        line = ''
-        for line in iter(sp.stdout.readline, b''):
+        line = ""
+        for line in iter(sp.stdout.readline, b""):
             line = line.decode(self.output_encoding).rstrip()
             self.log.info(line)
         sp.wait()
-        self.log.info(
-            "Command exited with return code %s",
-            sp.returncode
-        )
+        self.log.info("Command exited with return code %s", sp.returncode)
 
         if sp.returncode:
             raise AirflowException("dbt command failed")
 
     def on_kill(self):
-        self.log.info('Sending SIGTERM signal to dbt command')
+        self.log.info("Sending SIGTERM signal to dbt command")
         os.killpg(os.getpgid(self.sp.pid), signal.SIGTERM)

@@ -38,3 +38,7 @@ Support `--select` for the `DbtSnapshotOperator`.
 # v0.4.0
 
 Add the `DbtDocsGenerateOperator` and `DbtDepsOperator`.
+
+# v0.5.0
+
+Add `DbtRunOperationOperator` to allow isolated macro runs
